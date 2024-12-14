@@ -8,6 +8,11 @@ on:
 jobs:
   push_changes:
     runs-on: ubuntu-latest
+
+    env:
+      GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
+
+      
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -24,6 +29,4 @@ jobs:
         run: |
           git add .
           git commit -m "Increment version to v1"
-          git push
-        env:
-          GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
+          git push https://x-access-token:${{ secrets.GIT_TOKEN }}@github.com/OmerSade1/todo-aplication.git
