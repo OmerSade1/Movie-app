@@ -16,6 +16,7 @@ jobs:
       DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
       DB_NAME: ${{ secrets.DB_NAME }}
       DB_HOST: ${{ secrets.DB_HOST }}
+      GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
 
 
     steps:
@@ -88,5 +89,5 @@ jobs:
           git add VERSION.txt
           git commit -m "Increment version to v${{ env.VERSION }}"
           git push
-        env:
-          GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
+    
+        
