@@ -1,5 +1,4 @@
 FROM nginx:alpine
-LABEL authors="BiomedicLJZ"
 
 RUN apk add --no-cache procps
 
