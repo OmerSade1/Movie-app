@@ -1,0 +1,49 @@
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "8081:80"
+    volumes:
+      - ./frontend:/usr/share/nginx/html
+    depends_on:
+      - backend
+    networks:
+      - frontend_network
+
+  backend:
+    build: ./backend
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=development
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      - DB_HOST=${DB_HOST}  
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - db
+    networks:
+      - backend_network
+      - frontend_network
+
+  db:
+    image: mysql:5.7
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}  
+      - MYSQL_DATABASE=${DB_NAME} 
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql  
+      - ./db:/docker-entrypoint-initdb.d
+    networks:
+      - backend_network
+
+volumes:
+  db_data:
+
+networks:
+  frontend_network:
+    driver: bridge
+  backend_network:
+    driver: bridge

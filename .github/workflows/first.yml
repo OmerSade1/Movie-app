@@ -1,0 +1,89 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      DOCKER_REPO: omersade
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      DB_NAME: ${{ secrets.DB_NAME }}
+      DB_HOST: ${{ secrets.DB_HOST }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v2
+
+      - name: Install Docker Compose
+        run: |
+          sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
+
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      - name: Read current version from VERSION.txt
+        id: version
+        run: |
+          VERSION=$(cat VERSION.txt)
+          echo "Current version: $VERSION"
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Increment version
+        id: increment_version
+        run: |
+          NEW_VERSION=$((VERSION + 1))
+          echo "New version: $NEW_VERSION"
+          echo $NEW_VERSION > VERSION.txt
+          echo "VERSION=$NEW_VERSION" >> $GITHUB_ENV
+
+      - name: Create .env file with secrets
+        run: |
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" > .env
+          echo "DB_NAME=${{ secrets.DB_NAME }}" >> .env
+          echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env
+          cat .env # Optional: To verify the content (beware of logs)
+
+      - name: Build frontend image
+        run: docker build -t $DOCKER_REPO/frontend:v${{ env.VERSION }} ./frontend
+
+      - name: Build backend image
+        run: docker build -t $DOCKER_REPO/backend:v${{ env.VERSION }} ./backend
+
+      - name: Start services with Docker Compose
+        run: docker-compose --env-file .env up -d
+
+      - name: Wait for services to start
+        run: sleep 10
+
+      - name: Perform health check on frontend
+        run: curl -f http://localhost:8081 || exit 1
+
+      - name: Tag and push frontend image
+        run: |
+          docker push $DOCKER_REPO/frontend:v${{ env.VERSION }}
+
+      - name: Tag and push backend image
+        run: |
+          docker push $DOCKER_REPO/backend:v${{ env.VERSION }}
+
+      - name: Clean up
+        run: docker-compose down
+
+      - name: Commit and push updated version
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add VERSION.txt
+          git commit -m "Increment version to v${{ env.VERSION }}"
+          git push

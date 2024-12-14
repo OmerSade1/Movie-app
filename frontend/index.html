@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Todo App</title>
+</head>
+<body>
+<h1><font color="red">Todo App</font></h1>
+<ul id="todo-list"></ul>
+<input type="text" id="new-todo" placeholder="New todo">
+<button onclick="addTodo()">Add</button>
+
+<script>
+    const apiUrl = 'http://localhost:5000/todos';
+
+    async function fetchTodos() {
+        const response = await fetch(apiUrl);
+        const todos = await response.json();
+        const todoList = document.getElementById('todo-list');
+        todoList.innerHTML = '';
+        todos.forEach(todo => {
+            const li = document.createElement('li');
+            li.textContent = todo.text + (todo.done ? ' (done)' : '');
+            const updateButton = document.createElement('button');
+            updateButton.textContent = 'Update';
+            updateButton.onclick = () => updateTodo(todo.id);
+            li.appendChild(updateButton);
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Delete';
+            deleteButton.onclick = () => deleteTodo(todo.id);
+            li.appendChild(deleteButton);
+            todoList.appendChild(li);
+        });
+    }
+
+    async function addTodo() {
+        const newTodo = document.getElementById('new-todo').value;
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ text: newTodo })
+        });
+
+        if (response.ok) {
+            console.log(`Added new todo: ${newTodo}`);
+        } else {
+            console.log(`Failed to add new todo: ${newTodo}`);
+        }
+
+        document.getElementById('new-todo').value = '';
+        fetchTodos();
+    }
+
+    async function updateTodo(todoId) {
+        const newText = prompt('New text:');
+        const done = confirm('Done?');
+        await fetch(apiUrl + '/' + todoId, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ text: newText, done: done })
+        });
+        fetchTodos();
+    }
+
+    async function deleteTodo(todoId) {
+        await fetch(apiUrl + '/' + todoId, {
+            method: 'DELETE'
+        });
+        fetchTodos();
+    }
+
+    fetchTodos();
+</script>
+</body>
+</html>
