@@ -18,7 +18,6 @@ jobs:
       DB_HOST: ${{ secrets.DB_HOST }}
       
 
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
