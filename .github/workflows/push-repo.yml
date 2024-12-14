@@ -9,10 +9,11 @@ jobs:
   push_changes:
     runs-on: ubuntu-latest
 
+    
     env:
       GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
 
-      
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
