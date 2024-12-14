@@ -16,7 +16,6 @@ jobs:
       DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
       DB_NAME: ${{ secrets.DB_NAME }}
       DB_HOST: ${{ secrets.DB_HOST }}
-      GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
       
 
 
@@ -89,7 +88,7 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add VERSION.txt
           git commit -m "Increment version to v${{ env.VERSION }}"
-          git push https://github-actions[bot]:${{ secrets.GIT_TOKEN }}@github.com/${{ github.repository }} HEAD:main
+          git push 
         
           
     
