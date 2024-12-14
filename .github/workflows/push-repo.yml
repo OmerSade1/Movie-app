@@ -25,5 +25,6 @@ jobs:
         run: |
           git add .
           git commit -m "Increment version to v1"
-          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/OmerSade1/todo-aplication.git
+          git push --force https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/OmerSade1/todo-aplication.git
+
 
