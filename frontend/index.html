@@ -3,167 +3,230 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Movie App</title>
+    <title>Movie List</title>
     <style>
         body {
+            font-family: 'Arial', sans-serif;
+            background-color: #121212;
+            color: #fff;
             margin: 0;
             padding: 0;
-            font-family: Arial, sans-serif;
-            background: #141414;
-            color: white;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            height: 100vh;
-            overflow-y: scroll;
         }
-
         h1 {
-            color: #e50914;
-            font-size: 3rem;
-            margin: 20px 0;
             text-align: center;
+            margin-top: 40px;
+            font-size: 2.5em;
+            color: #ff4747;
         }
-
-        .movie-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 20px;
+        h3 {
+            color: #ff4747;
+            font-size: 1.8em;
+        }
+        .form-container {
+            margin: 20px auto;
+            width: 80%;
+            max-width: 600px;
+            background-color: #1c1c1c;
             padding: 20px;
-            width: 100%;
-            max-width: 1200px;
-        }
-
-        .movie-card {
-            background-color: #333;
             border-radius: 10px;
-            padding: 15px;
-            text-align: center;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
-            position: relative;
         }
-
-        .movie-card img {
-            width: 100%;
-            border-radius: 8px;
+        .form-container input {
+            width: calc(50% - 12px);
+            padding: 12px;
+            margin-right: 10px;
+            background-color: #333;
+            border: 1px solid #444;
+            color: #fff;
+            border-radius: 5px;
         }
-
-        .movie-card button {
-            position: absolute;
-            bottom: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: #e50914;
-            color: white;
+        .form-container button {
+            padding: 12px 20px;
+            background-color: #ff4747;
             border: none;
             border-radius: 5px;
-            padding: 5px 15px;
+            color: white;
+            font-size: 1.2em;
             cursor: pointer;
-            transition: background-color 0.3s ease;
         }
-
-        .movie-card button:hover {
-            background-color: #b20710;
+        .form-container button:hover {
+            background-color: #e63d3d;
         }
-
-        .movie-form {
-            display: flex;
-            justify-content: center;
-            padding: 10px;
-            gap: 10px;
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background-color: #1c1c1c;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
         }
-
-        .movie-form input, .movie-form button {
-            padding: 10px;
-            font-size: 1rem;
-            border-radius: 5px;
+        th, td {
+            padding: 12px;
+            border: 1px solid #444;
+            text-align: center;
         }
-
-        .movie-form input {
-            width: 200px;
-        }
-
-        .movie-form button {
-            background-color: #e50914;
+        th {
+            background-color: #ff4747;
             color: white;
-            border: none;
         }
-
-        .movie-form button:hover {
-            background-color: #b20710;
+        td {
+            background-color: #2b2b2b;
+            color: white;
+        }
+        td button {
+            padding: 6px 12px;
+            background-color: #ff4747;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+        }
+        td button:hover {
+            background-color: #e63d3d;
+        }
+        img {
+            max-width: 100px;
+            border-radius: 5px;
         }
     </style>
 </head>
 <body>
-    <h1>Movie App</h1>
 
-    <div class="movie-form">
-        <input type="text" id="movie-name" placeholder="Enter movie name" />
-        <input type="url" id="movie-poster" placeholder="Enter movie poster URL" />
+    <h1>Movie List</h1>
+
+    <div class="form-container">
+        <h3>Add New Movie</h3>
+        <input type="text" id="movie-name" placeholder="Movie Name" />
+        <input type="text" id="movie-poster" placeholder="Movie Poster URL" />
         <button onclick="addMovie()">Add Movie</button>
     </div>
 
-    <div class="movie-list" id="movie-list"></div>
+    <h3>Movies</h3>
+    <table id="movie-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Poster</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Movie rows will be inserted here -->
+        </tbody>
+    </table>
 
     <script>
-        const apiUrl = 'http://localhost:5000/movies';
+        const apiUrl = 'http://127.0.0.1:5000/movies';
 
-        async function fetchMovies() {
-            const response = await fetch(apiUrl);
-            const movies = await response.json();
-            const movieList = document.getElementById('movie-list');
-            movieList.innerHTML = '';
-            movies.forEach(movie => {
-                const div = document.createElement('div');
-                div.classList.add('movie-card');
-                div.innerHTML = `
-                    <img src="${movie.poster}" alt="${movie.name}" />
-                    <h3>${movie.name}</h3>
-                    <button onclick="deleteMovie(${movie.id})">Delete</button>
-                `;
-                movieList.appendChild(div);
-            });
+        // Fetch movies and display them in the table
+        function fetchMovies() {
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    const movieTableBody = document.getElementById('movie-table').getElementsByTagName('tbody')[0];
+                    movieTableBody.innerHTML = ''; // Clear the table
+
+                    data.forEach(movie => {
+                        const row = movieTableBody.insertRow();
+                        row.innerHTML = `
+                            <td>${movie.id}</td>
+                            <td>${movie.name}</td>
+                            <td><img src="${movie.poster}" alt="${movie.name}" /></td>
+                            <td>
+                                <button onclick="editMovie(${movie.id}, '${movie.name}', '${movie.poster}')">Edit</button>
+                                <button onclick="deleteMovie(${movie.id})">Delete</button>
+                            </td>
+                        `;
+                    });
+                });
         }
 
-        async function addMovie() {
+        // Add a new movie
+        function addMovie() {
             const name = document.getElementById('movie-name').value;
             const poster = document.getElementById('movie-poster').value;
 
-            const response = await fetch(apiUrl, {
+            if (!name || !poster) {
+                alert("Please provide both movie name and poster URL.");
+                return;
+            }
+
+            const newMovie = {
+                name: name,
+                poster: poster
+            };
+
+            fetch(apiUrl, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ name, poster })
+                body: JSON.stringify(newMovie),
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert("Movie added successfully!");
+                    fetchMovies(); // Refresh the movie list
+                } else {
+                    alert("Failed to add movie.");
+                }
             });
-
-            if (response.ok) {
-                fetchMovies();
-            } else {
-                alert("Failed to add movie.");
-            }
-
-            document.getElementById('movie-name').value = '';
-            document.getElementById('movie-poster').value = '';
         }
 
-        async function deleteMovie(id) {
-            const response = await fetch(`${apiUrl}/${id}`, {
-                method: 'DELETE'
+        // Delete a movie by ID
+        function deleteMovie(id) {
+            fetch(`${apiUrl}/${id}`, {
+                method: 'DELETE',
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert("Movie deleted successfully!");
+                    fetchMovies(); // Refresh the movie list
+                } else {
+                    alert("Failed to delete movie.");
+                }
             });
+        }
 
-            if (response.ok) {
-                fetchMovies();
-            } else {
-                alert("Failed to delete movie.");
+        // Edit a movie by ID
+        function editMovie(id, currentName, currentPoster) {
+            const newName = prompt("Edit movie name:", currentName);
+            const newPoster = prompt("Edit movie poster URL:", currentPoster);
+
+            if (newName && newPoster) {
+                const updatedMovie = {
+                    name: newName,
+                    poster: newPoster
+                };
+
+                fetch(`${apiUrl}/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(updatedMovie),
+                })
+                .then(response => {
+                    if (response.ok) {
+                        alert("Movie updated successfully!");
+                        fetchMovies(); // Refresh the movie list
+                    } else {
+                        alert("Failed to update movie.");
+                    }
+                });
             }
         }
 
+        // Initial fetch to display movies
         fetchMovies();
     </script>
+
 </body>
 </html>
+
+
+
 
 
 
