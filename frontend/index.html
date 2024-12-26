@@ -3,173 +3,168 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Todo App</title>
+    <title>Movie App</title>
     <style>
         body {
             margin: 0;
             padding: 0;
             font-family: Arial, sans-serif;
-            background: linear-gradient(to bottom right, #4facfe, #00f2fe);
-            color: #333;
+            background: #141414;
+            color: white;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             height: 100vh;
+            overflow-y: scroll;
         }
 
         h1 {
-            color: #ff6f61;
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+            color: #e50914;
+            font-size: 3rem;
+            margin: 20px 0;
+            text-align: center;
         }
 
-        #todo-list {
-            list-style: none;
-            padding: 0;
+        .movie-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 20px;
             width: 100%;
-            max-width: 500px;
-            margin: 1rem 0;
-            background: #fff;
+            max-width: 1200px;
+        }
+
+        .movie-card {
+            background-color: #333;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .movie-card img {
+            width: 100%;
             border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            overflow: hidden;
         }
 
-        #todo-list li {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem;
-            border-bottom: 1px solid #ddd;
-        }
-
-        #todo-list li:last-child {
-            border-bottom: none;
-        }
-
-        #todo-list li button {
-            margin-left: 10px;
-            background-color: #ff6f61;
+        .movie-card button {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #e50914;
             color: white;
             border: none;
             border-radius: 5px;
-            padding: 5px 10px;
+            padding: 5px 15px;
             cursor: pointer;
             transition: background-color 0.3s ease;
         }
 
-        #todo-list li button:hover {
-            background-color: #d9554d;
+        .movie-card button:hover {
+            background-color: #b20710;
         }
 
-        #new-todo {
-            padding: 0.8rem;
-            font-size: 1rem;
-            border: none;
-            border-radius: 5px;
-            margin-right: 0.5rem;
-            width: calc(100% - 120px);
-            max-width: 380px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-
-        button {
-            padding: 0.8rem 1.2rem;
-            font-size: 1rem;
-            border: none;
-            border-radius: 5px;
-            background-color: #4caf50;
-            color: white;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        button:hover {
-            background-color: #43a047;
-        }
-
-        .input-container {
+        .movie-form {
             display: flex;
-            align-items: center;
             justify-content: center;
-            width: 100%;
-            max-width: 500px;
+            padding: 10px;
+            gap: 10px;
+        }
+
+        .movie-form input, .movie-form button {
+            padding: 10px;
+            font-size: 1rem;
+            border-radius: 5px;
+        }
+
+        .movie-form input {
+            width: 200px;
+        }
+
+        .movie-form button {
+            background-color: #e50914;
+            color: white;
+            border: none;
+        }
+
+        .movie-form button:hover {
+            background-color: #b20710;
         }
     </style>
 </head>
 <body>
-    <h1>Todo App</h1>
-    <ul id="todo-list"></ul>
-    <div class="input-container">
-        <input type="text" id="new-todo" placeholder="New todo">
-        <button onclick="addTodo()">Add</button>
-    </div>
-    <script>
-        const apiUrl = 'http://localhost:5000/todos';
+    <h1>Movie App</h1>
 
-        async function fetchTodos() {
+    <div class="movie-form">
+        <input type="text" id="movie-name" placeholder="Enter movie name" />
+        <input type="url" id="movie-poster" placeholder="Enter movie poster URL" />
+        <button onclick="addMovie()">Add Movie</button>
+    </div>
+
+    <div class="movie-list" id="movie-list"></div>
+
+    <script>
+        const apiUrl = 'http://localhost:5000/movies';
+
+        async function fetchMovies() {
             const response = await fetch(apiUrl);
-            const todos = await response.json();
-            const todoList = document.getElementById('todo-list');
-            todoList.innerHTML = '';
-            todos.forEach(todo => {
-                const li = document.createElement('li');
-                li.textContent = todo.text + (todo.done ? ' (done)' : '');
-                const updateButton = document.createElement('button');
-                updateButton.textContent = 'Update';
-                updateButton.onclick = () => updateTodo(todo.id);
-                li.appendChild(updateButton);
-                const deleteButton = document.createElement('button');
-                deleteButton.textContent = 'Delete';
-                deleteButton.onclick = () => deleteTodo(todo.id);
-                li.appendChild(deleteButton);
-                todoList.appendChild(li);
+            const movies = await response.json();
+            const movieList = document.getElementById('movie-list');
+            movieList.innerHTML = '';
+            movies.forEach(movie => {
+                const div = document.createElement('div');
+                div.classList.add('movie-card');
+                div.innerHTML = `
+                    <img src="${movie.poster}" alt="${movie.name}" />
+                    <h3>${movie.name}</h3>
+                    <button onclick="deleteMovie(${movie.id})">Delete</button>
+                `;
+                movieList.appendChild(div);
             });
         }
 
-        async function addTodo() {
-            const newTodo = document.getElementById('new-todo').value;
+        async function addMovie() {
+            const name = document.getElementById('movie-name').value;
+            const poster = document.getElementById('movie-poster').value;
+
             const response = await fetch(apiUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ text: newTodo })
+                body: JSON.stringify({ name, poster })
             });
 
             if (response.ok) {
-                console.log(`Added new todo: ${newTodo}`);
+                fetchMovies();
             } else {
-                console.log(`Failed to add new todo: ${newTodo}`);
+                alert("Failed to add movie.");
             }
 
-            document.getElementById('new-todo').value = '';
-            fetchTodos();
+            document.getElementById('movie-name').value = '';
+            document.getElementById('movie-poster').value = '';
         }
 
-        async function updateTodo(todoId) {
-            const newText = prompt('New text:');
-            const done = confirm('Done?');
-            await fetch(apiUrl + '/' + todoId, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ text: newText, done: done })
-            });
-            fetchTodos();
-        }
-
-        async function deleteTodo(todoId) {
-            await fetch(apiUrl + '/' + todoId, {
+        async function deleteMovie(id) {
+            const response = await fetch(`${apiUrl}/${id}`, {
                 method: 'DELETE'
             });
-            fetchTodos();
+
+            if (response.ok) {
+                fetchMovies();
+            } else {
+                alert("Failed to delete movie.");
+            }
         }
 
-        fetchTodos();
+        fetchMovies();
     </script>
 </body>
 </html>
+
+
+
+

@@ -16,39 +16,42 @@ db = SQLAlchemy(app)
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 
-class Todo(db.Model):
+class Movie(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    text = db.Column(db.String(120), nullable=False)
+    name = db.Column(db.String(120), nullable=False)
+    poster = db.Column(db.String(255), nullable=False)
 
-@app.route('/todos', methods=['GET'])
-def get_todos():
-    todos = Todo.query.all()
-    app.logger.info('Fetched todos: %s', todos)
-    return jsonify([{'id': todo.id, 'text': todo.text} for todo in todos])
+@app.route('/movies', methods=['GET'])
+def get_movies():
+    movies = Movie.query.all()
+    app.logger.info('Fetched movies: %s', movies)
+    return jsonify([{'id': movie.id, 'name': movie.name, 'poster': movie.poster} for movie in movies])
 
-@app.route('/todos', methods=['POST'])
-def add_todo():
+@app.route('/movies', methods=['POST'])
+def add_movie():
     data = request.get_json()
-    new_todo = Todo(text=data['text'])
-    db.session.add(new_todo)
+    new_movie = Movie(name=data['name'], poster=data['poster'])
+    db.session.add(new_movie)
     try:
         db.session.commit()
-        app.logger.info('Added new todo: %s', new_todo)
-        print(f"Added new todo: {new_todo.text}")
+        app.logger.info('Added new movie: %s', new_movie)
         return '', 201
     except Exception as e:
-        print(f"Failed to add new todo: {new_todo.text}. Error: {str(e)}")
         return str(e), 500
-    
-@app.route('/todos/<int:id>', methods=['DELETE'])
-def delete_todo(id):
-	todo = Todo.query.get(id)
-	if todo is None:
-		return '', 404
-	db.session.delete(todo)
-	db.session.commit()
-	app.logger.info('Deleted todo: %s', todo)
-	return '', 204
+
+@app.route('/movies/<int:id>', methods=['DELETE'])
+def delete_movie(id):
+    movie = Movie.query.get(id)
+    if movie is None:
+        return '', 404
+    db.session.delete(movie)
+    db.session.commit()
+    app.logger.info('Deleted movie: %s', movie)
+    return '', 204
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
+
+
+
+

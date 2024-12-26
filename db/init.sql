@@ -1,7 +1,8 @@
 CREATE DATABASE IF NOT EXISTS todo_db;
 USE todo_db;
 
-CREATE TABLE IF NOT EXISTS todo (
-                                    id INT AUTO_INCREMENT PRIMARY KEY,
-                                    text VARCHAR(255) NOT NULL
+CREATE TABLE IF NOT EXISTS movie (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    poster VARCHAR(255) NOT NULL
 );
