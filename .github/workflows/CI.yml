@@ -38,21 +38,6 @@ jobs:
         run: |
           aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPO
 
-      - name: Read current version from VERSION.txt
-        id: version
-        run: |
-          VERSION=$(cat VERSION.txt)
-          echo "Current version: $VERSION"
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
-
-      - name: Increment version
-        id: increment_version
-        run: |
-          NEW_VERSION=$((VERSION + 1))
-          echo "New version: $NEW_VERSION"
-          echo $NEW_VERSION > VERSION.txt
-          echo "VERSION=$NEW_VERSION" >> $GITHUB_ENV
-
       - name: Create .env file with secrets
         run: |
           echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" > .env
@@ -60,11 +45,15 @@ jobs:
           echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env
           cat .env # Optional: To verify the content (beware of logs)
 
+      - name: Get the latest commit SHA
+        id: git-info
+        run: echo "sha=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
       - name: Build frontend image
-        run: docker build -t $ECR_REPO:frontend-v${{ env.VERSION }} ./frontend
+        run: docker build -t $ECR_REPO:frontend-${{ env.sha }} ./frontend
 
       - name: Build backend image
-        run: docker build -t $ECR_REPO:backend-v${{ env.VERSION }} ./backend
+        run: docker build -t $ECR_REPO:backend-${{ env.sha }} ./backend
 
       - name: Start services with Docker Compose
         run: docker-compose --env-file .env up -d
@@ -77,22 +66,16 @@ jobs:
 
       - name: Tag and push frontend image
         run: |
-          docker push $ECR_REPO:frontend-v${{ env.VERSION }}
+          docker push $ECR_REPO:frontend-${{ env.sha }}
 
       - name: Tag and push backend image
         run: |
-          docker push $ECR_REPO:backend-v${{ env.VERSION }}
+          docker push $ECR_REPO:backend-${{ env.sha }}
 
       - name: Clean up
         run: docker-compose down
 
-      - name: Commit and push updated version
-        run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add VERSION.txt
-          git commit -m "Increment version to v${{ env.VERSION }}"
-          git push
+   
 
         
           
