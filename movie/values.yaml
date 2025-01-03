@@ -1,0 +1,23 @@
+frontend:
+  image: omersade/frontend-movie:v1
+  port: 80
+  volumePath: /home/omer/Movie-app/frontend
+
+backend:
+  image: omersade/backend-movie:v1
+  port: 5000
+  env:
+    FLASK_ENV: development
+    DB_HOST: db
+    DB_NAME: todo_db
+    DB_PASSWORD: "3502"
+
+db:
+  image: mysql:5.7
+  port: 3306
+  rootPassword: "3502"
+  database: todo_db
+  volumeSize: 1Gi
+
+
+
