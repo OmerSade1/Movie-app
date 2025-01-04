@@ -75,7 +75,44 @@ jobs:
       - name: Clean up
         run: docker-compose down
 
+
+      - name: Login to GitHub
+        run: |
+            git config --global user.name "GitHub Actions"
+            git config --global user.email "actions@github.com"
+  
    
+      - name: Clone GitOps Repository
+        run: |
+            cd /home/runner/work/
+            git clone https://github.com/OmerSade1/argocd-gitops
+            cd /home/runner/work/argocd-gitops/environments/
+          
+  
+      - name: Update Values File
+        run: |
+            cd /home/runner/work/argocd-gitops/environments/
+  
+            if [[ "${{ github.ref_name }}" == "main" ]]; then
+              env_dir="dev"
+            elif [[ "${{ github.ref_name }}" == "staging" ]]; then
+              env_dir="staging"
+            elif [[ "${{ github.ref_name }}" == "prod" ]]; then
+              env_dir="prod"
+            elif [[ "${{ github.ref_name }}" == "dev" ]]; then
+              env_dir="dev"
+            fi
+  
+            sed -i "s|tag: frontend-.*|tag: frontend-${{ env.sha }}|" $env_dir/values.yaml
+            sed -i "s|tag: backend-.*|tag: backend-${{ env.sha }}|" $env_dir/values.yaml
+  
+      - name: Commit and Push Changes
+        run: |
+            cd /home/runner/work/argocd-gitops/
+            git add .
+            git commit -m "Update image tags for ${{ github.ref_name }} to ${{ env.sha }}"
+            git push
+         
 
         
           
