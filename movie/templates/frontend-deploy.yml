@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: omersade/frontend-movie:v2
+        image: omersade/frontend-movie:v3 
         ports:
         - containerPort: 80
 

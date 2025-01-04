@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: backend
-        image: omersade/backend-movie:v2
+        image: omersade/backend-movie:v3
         env:
         - name: DB_PASSWORD
           value: "3502"
