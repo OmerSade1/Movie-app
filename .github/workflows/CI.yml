@@ -105,8 +105,8 @@ jobs:
             elif [[ "${{ github.ref_name }}" == "dev" ]]; then
               env_dir="dev"
             fi
-            
-  
+
+
             sed -i "s|tag: frontend-.*|tag: frontend-${{ env.sha }}|" $env_dir/values.yaml
             sed -i "s|tag: backend-.*|tag: backend-${{ env.sha }}|" $env_dir/values.yaml
   
