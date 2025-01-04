@@ -88,9 +88,10 @@ jobs:
       - name: Clone GitOps Repository
         run: |
             cd /home/runner/work/
-            git clone https://github.com/OmerSade1/argocd-gitops
+            git clone https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/OmerSade1/Movie-app.git
             cd /home/runner/work/argocd-gitops/environments/
-          
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
   
       - name: Update Values File
         run: |
@@ -116,6 +117,8 @@ jobs:
             git add .
             git commit -m "Update image tags for ${{ github.ref_name }} to ${{ env.sha }}"
             git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
          
 
         
