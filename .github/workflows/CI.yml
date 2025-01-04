@@ -112,7 +112,7 @@ jobs:
   
       - name: Commit and Push Changes
         run: |
-            cd /home/runner/work/argocd-gitops/
+            cd /home/runner/work/argocd-gitops/environments/
             git add .
             git commit -m "Update image tags for ${{ github.ref_name }} to ${{ env.sha }}"
             git push
