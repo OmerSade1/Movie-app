@@ -38,7 +38,7 @@ services:
       - ./db:/docker-entrypoint-initdb.d
     networks:
       - backend_network
-
+      
 volumes:
   db_data:
 
