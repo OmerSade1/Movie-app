@@ -10,7 +10,7 @@ CORS(app)
 db_password = os.getenv('DB_PASSWORD')
 db_name = os.getenv('DB_NAME')
 
-app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql://root:{db_password}@db-mysql.cha4akq0c089.us-east-1.rds.amazonaws.com/{db_name}"
+app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql://omer:{db_password}@db-mysql.cha4akq0c089.us-east-1.rds.amazonaws.com/{db_name}"
 db = SQLAlchemy(app)
 
 # Configure logging
