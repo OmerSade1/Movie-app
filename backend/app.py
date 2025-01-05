@@ -3,6 +3,7 @@ import logging
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
+import pymysql
 
 app = Flask(__name__)
 CORS(app)
@@ -10,12 +11,48 @@ CORS(app)
 db_password = os.getenv('DB_PASSWORD')
 db_name = os.getenv('DB_NAME')
 
-app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql://root:{db_password}@db/{db_name}"
+# Set the URI for SQLAlchemy to connect to MySQL
+app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql://omer:{db_password}@db-mysql.cha4akq0c089.us-east-1.rds.amazonaws.com/{db_name}"
 db = SQLAlchemy(app)
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 
+# Ensure the database and table are created
+def create_database_and_table():
+    # Connect to MySQL server
+    connection = pymysql.connect(
+        host='db-mysql.cha4akq0c089.us-east-1.rds.amazonaws.com',  
+        user='omer',
+        password=db_password
+    )
+
+    try:
+        with connection.cursor() as cursor:
+            # Create database if it doesn't exist
+            cursor.execute(f"CREATE DATABASE IF NOT EXISTS {db_name};")
+
+            # Use the created database
+            cursor.execute(f"USE {db_name};")
+
+            # Create the movie table if it doesn't exist
+            cursor.execute('''
+            CREATE TABLE IF NOT EXISTS movie (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                name VARCHAR(255) NOT NULL,
+                poster VARCHAR(255) NOT NULL
+            );
+            ''')
+
+            connection.commit()
+            app.logger.info(f"Database {db_name} and table 'movie' created (if they didn't exist).")
+    finally:
+        connection.close()
+
+# Call the function to create the database and table
+create_database_and_table()
+
+# Define Movie model
 class Movie(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), nullable=False)
@@ -71,4 +108,5 @@ def edit_movie(id):
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
+
 
