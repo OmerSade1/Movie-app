@@ -27,6 +27,7 @@ services:
       - backend_network
       - frontend_network
 
+
   db:
     image: mysql:5.7
     environment:
@@ -38,7 +39,7 @@ services:
       - ./db:/docker-entrypoint-initdb.d
     networks:
       - backend_network
-      
+
 volumes:
   db_data:
 
