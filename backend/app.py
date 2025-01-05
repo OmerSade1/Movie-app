@@ -22,7 +22,7 @@ logging.basicConfig(level=logging.DEBUG)
 def create_database_and_table():
     # Connect to MySQL server
     connection = pymysql.connect(
-        host='db-mysql.cha4akq0c089.us-east-1.rds.amazonaws.com',  # Replace with your MySQL server host
+        host='db-mysql.cha4akq0c089.us-east-1.rds.amazonaws.com',  
         user='omer',
         password=db_password
     )
