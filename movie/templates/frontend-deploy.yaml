@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+spec:
+  replicas: {{ .Values.frontend.image.replicas }}
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: {{ .Values.frontend.image.repository }}:{{ .Values.frontend.image.tag }}
+        ports:
+        - containerPort: {{ .Values.frontend.image.containerPort }}
+        resources:
+          requests:
+            cpu: {{ .Values.frontend.image.resources.requests.cpu }}
+            memory: {{ .Values.frontend.image.resources.requests.memory }}
+          limits:
+            cpu: {{ .Values.frontend.image.resources.limits.cpu }}
+            memory: {{ .Values.frontend.image.resources.limits.memory }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+spec:
+  selector:
+    app: frontend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: {{ .Values.frontend.image.containerPort }}
+  type: ClusterIP
+
+
