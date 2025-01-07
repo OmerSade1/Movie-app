@@ -1,6 +1,6 @@
 frontend:
   image:
-    replicas: 2
+    replicas: 1
     repository: 058264527754.dkr.ecr.us-east-1.amazonaws.com/movie_app_repo
     tag: frontend-test
     containerPort: 80
@@ -14,9 +14,10 @@ frontend:
   ingress:
     host: "app.omsad.xyz"
     path: "/"
+
 backend:
   image:
-    replicas: 3
+    replicas: 1
     repository: 058264527754.dkr.ecr.us-east-1.amazonaws.com/movie_app_repo
     tag: backend-test
     containerPort: 5000
@@ -30,9 +31,10 @@ backend:
   ingress:
     host: "backend.omsad.xyz"
     path: "/movies"
-  dbSecret:
-    path: "movie-app/db-credentials"
-    region: us-east-1
 
+
+
+
+ 
 
 
