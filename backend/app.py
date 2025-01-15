@@ -27,6 +27,7 @@ def create_database_and_table():
         password=db_password
     )
 
+
     try:
         with connection.cursor() as cursor:
             # Create database if it doesn't exist
