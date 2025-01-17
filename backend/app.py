@@ -4,9 +4,13 @@ from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 import pymysql
+from prometheus_flask_exporter import PrometheusMetrics  # Import PrometheusMetrics
 
 app = Flask(__name__)
 CORS(app)
+
+# Initialize Prometheus metrics exporter
+metrics = PrometheusMetrics(app)
 
 db_password = os.getenv('DB_PASSWORD')
 db_name = os.getenv('DB_NAME')
@@ -20,23 +24,15 @@ logging.basicConfig(level=logging.DEBUG)
 
 # Ensure the database and table are created
 def create_database_and_table():
-    # Connect to MySQL server
     connection = pymysql.connect(
-        host='db-mysql.cha4akq0c089.us-east-1.rds.amazonaws.com',  
+        host='db-mysql.cha4akq0c089.us-east-1.rds.amazonaws.com',
         user='omer',
         password=db_password
     )
-
-
     try:
         with connection.cursor() as cursor:
-            # Create database if it doesn't exist
             cursor.execute(f"CREATE DATABASE IF NOT EXISTS {db_name};")
-
-            # Use the created database
             cursor.execute(f"USE {db_name};")
-
-            # Create the movie table if it doesn't exist
             cursor.execute('''
             CREATE TABLE IF NOT EXISTS movie (
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -44,7 +40,6 @@ def create_database_and_table():
                 poster VARCHAR(255) NOT NULL
             );
             ''')
-
             connection.commit()
             app.logger.info(f"Database {db_name} and table 'movie' created (if they didn't exist).")
     finally:
@@ -107,7 +102,9 @@ def edit_movie(id):
     except Exception as e:
         return str(e), 500
 
+# Prometheus Metrics will be available at /metrics
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
+
 
 

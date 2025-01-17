@@ -4,3 +4,4 @@ pymysql
 flask-cors
 gunicorn
 cryptography
+prometheus_flask_exporter
