@@ -3,7 +3,7 @@ kind: ServiceMonitor
 metadata:
   name: backend-monitor
   labels:
-    release: {{ .Release.Name }}
+    release: my-kube-prometheus-stack 
 spec:
   selector:
     matchLabels:
@@ -21,7 +21,7 @@ kind: ServiceMonitor
 metadata:
   name: frontend-monitor
   labels:
-    release: {{ .Release.Name }}
+    release: my-kube-prometheus-stack 
 spec:
   selector:
     matchLabels:
