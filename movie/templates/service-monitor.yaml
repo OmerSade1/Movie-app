@@ -3,17 +3,18 @@ kind: ServiceMonitor
 metadata:
   name: backend-monitor
   labels:
-    release: my-kube-prometheus-stack 
+    release: my-kube-prometheus-stack
 spec:
   selector:
     matchLabels:
       app: backend
   namespaceSelector:
     matchNames:
-      - default  
+      - default
   endpoints:
     - port: "5000"
-      path: "/metrics"
+      path: "/movies/metrics" 
+      scheme: https           
       interval: 30s
 ---
 apiVersion: monitoring.coreos.com/v1
@@ -21,15 +22,17 @@ kind: ServiceMonitor
 metadata:
   name: frontend-monitor
   labels:
-    release: my-kube-prometheus-stack 
+    release: my-kube-prometheus-stack
 spec:
   selector:
     matchLabels:
       app: frontend
   namespaceSelector:
     matchNames:
-      - default  
+      - default
   endpoints:
     - port: "80"
-      path: "/metrics"
+      path: "/metrics"         
+      scheme: https           
       interval: 30s
+
