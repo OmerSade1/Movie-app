@@ -13,7 +13,7 @@ spec:
       - default
   endpoints:
     - port: "5000"
-      path: "/movies/metrics" 
+      path: "/metrics" 
       scheme: https           
       interval: 30s
 ---
