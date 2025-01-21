@@ -28,7 +28,8 @@ def create_database_and_table():
         host='db-mysql.cha4akq0c089.us-east-1.rds.amazonaws.com',
         user='omer',
         password=db_password
-    )
+ 
+   )
     try:
         with connection.cursor() as cursor:
             cursor.execute(f"CREATE DATABASE IF NOT EXISTS {db_name};")
