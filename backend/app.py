@@ -27,8 +27,7 @@ def create_database_and_table():
     connection = pymysql.connect(
         host='db-mysql.cha4akq0c089.us-east-1.rds.amazonaws.com',
         user='omer',
-        password=db_password
- 
+        password=db_password 
    )
     try:
         with connection.cursor() as cursor:
